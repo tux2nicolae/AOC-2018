@@ -39,10 +39,11 @@ int main()
   assert(in.good());
   assert(out.good());
 
-  int maxSize = 301;
-  int serial = 4455;
+  constexpr int maxSize = 301;
+  constexpr int serial = 8979;
 
-  vector<vector<int>> partialSums(maxSize, vector<int>(maxSize, 0));
+  int lineSums[maxSize][maxSize]{};
+  int columnSums[maxSize][maxSize]{};
 
   // calculate partial sums
   for (int i = 1; i < maxSize; i++)
@@ -56,29 +57,23 @@ int main()
       fuel = (fuel / 100) % 10;
       fuel -= 5;
 
-      partialSums[i][j] = partialSums[i][j - 1] + fuel;
+      lineSums[i][j] = lineSums[i][j - 1] + fuel;
+      columnSums[i][j] = columnSums[i - 1][j] + fuel;
     }
   }
 
-  // find max square
+  // find max square in O(n^3) iterations count : 9045050 
   int max = -100000, maxi = 0, maxj = 0, maxn = 0;
-  for (int n = 1; n < maxSize; n++)
+  for (int i = 1; i < maxSize; ++i)
   {
-    for (int i = 1; i + n < maxSize; ++i)
+    for (int j = 1; j < maxSize; ++j)
     {
-      for (int j = 1; j + n < maxSize; ++j)
+      int sum = 0;
+      for (int n = 0; n < maxSize - std::max(i, j); n++)
       {
-        // get square sum
-
-        int begj = j - 1;
-        int endj = j + n - 1;
-
-        int sum = 0;
-        for (int k = i; k < i + n; k++)
-        {
-          sum += partialSums[k][endj] - partialSums[k][begj];
-        }
-
+        sum += lineSums[i + n][j + n - 1] - lineSums[i + n][j - 1];
+        sum += columnSums[i + n][j + n] - columnSums[i - 1][j + n];
+        
         if (max < sum)
         {
           max = sum;
@@ -90,7 +85,6 @@ int main()
     }
   }
 
-  cout << maxi << "," << maxj << "," << maxn << endl;
-  
+  cout << maxi << "," << maxj << "," << maxn + 1 << endl;
   return 0;
 }
