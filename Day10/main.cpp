@@ -102,8 +102,8 @@ int main()
 
   for (int i = 100; i < 400 ; i++)
   {
-  	for (int j = 100; j < 400; j++)
-  	{
+    for (int j = 100; j < 400; j++)
+    {
       auto it = find_if(begin(points), end(points), [=](auto & point) 
       {
         return point.position.first == j && point.position.second == i;
@@ -117,7 +117,7 @@ int main()
       {
         out << ' ';
       }
-  	}
+    }
     out << endl;
   }
 
