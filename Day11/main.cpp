@@ -34,25 +34,25 @@ using namespace AOC;
 
 int main()
 {
-  ifstream in("D:\\AOC-2018\\Day11\\Day11.in");
-  ofstream out("D:\\AOC-2018\\Day11\\Day11.out");
-  assert(in.good());
-  assert(out.good());
+  // ifstream in("D:\\AOC-2018\\Day11\\Day11.in");
+  // ofstream out("D:\\AOC-2018\\Day11\\Day11.out");
+  // assert(in.good());
+  // assert(out.good());
 
-  constexpr int maxSize = 301;
-  constexpr int serial = 8979;
+  constexpr int kMaxSize = 301;
+  constexpr int kSerial = 8979;
 
-  int lineSums[maxSize][maxSize]{};
-  int columnSums[maxSize][maxSize]{};
+  int lineSums[kMaxSize][kMaxSize]{};
+  int columnSums[kMaxSize][kMaxSize]{};
 
   // calculate partial sums
-  for (int i = 1; i < maxSize; i++)
+  for (int i = 1; i < kMaxSize; i++)
   {
-    for (int j = 1; j < maxSize; j++)
+    for (int j = 1; j < kMaxSize; j++)
     {
       int rackID = i + 10;
       int fuel = rackID * j;
-      fuel += serial;
+      fuel += kSerial;
       fuel *= rackID;
       fuel = (fuel / 100) % 10;
       fuel -= 5;
@@ -64,12 +64,12 @@ int main()
 
   // find max square in O(n^3) iterations count : 9045050 
   int max = -100000, maxi = 0, maxj = 0, maxn = 0;
-  for (int i = 1; i < maxSize; ++i)
+  for (int i = 1; i < kMaxSize; ++i)
   {
-    for (int j = 1; j < maxSize; ++j)
+    for (int j = 1; j < kMaxSize; ++j)
     {
       int sum = 0;
-      for (int n = 0; n < maxSize - std::max(i, j); n++)
+      for (int n = 0; n < kMaxSize - std::max(i, j); n++)
       {
         sum += lineSums[i + n][j + n - 1] - lineSums[i + n][j - 1];
         sum += columnSums[i + n][j + n] - columnSums[i - 1][j + n];
