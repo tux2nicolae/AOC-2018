@@ -1,0 +1,17 @@
+{
+    "firstname": "Nicolae",
+    "lastname": "Telechi",
+    "object": {
+      "test": "value"
+    },
+    "array": [
+      {
+        "key": "1",
+        "value": "1-blabla"
+      },
+      {
+        "key": "2",
+        "value": "2-blabla"
+      }
+    ]
+  }

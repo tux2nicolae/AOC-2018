@@ -1,0 +1,11 @@
+*.user
+*.sln
+*.vcxproj
+*.filters
+.vs/
+ipch/
+Debug/
+Release/
+Win32/
+x64/
+win/
