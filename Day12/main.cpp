@@ -39,46 +39,44 @@ int main()
   assert(in.good());
   assert(out.good());
 
+  string currentState;
+  in >> currentState;
 
-  string initialState;
-  in >> initialState;
+  int offset = 500;
+  currentState = string(offset, '.') + currentState + string(offset, '.');
+
+  vector<pair<string, char>> notes;
 
   char c;
   string note;
-
-  vector<pair<string, char>> notes;
-  vector<pair<string, char>> notesNext;
 
   while (in >> note >> c)
   {
     notes.push_back(make_pair(note, c));
   }
 
-  int offset = 500;
-  initialState = string(offset, '.') + initialState + string(offset, '.');
-
   for (int i = 0; i < 100 ; i++)
   {
-    string temp(initialState.size(), '.');
+    string temp(currentState.size(), '.');
 
     for (auto & note : notes)
     {
-      auto it = initialState.find(note.first);
+      auto it = currentState.find(note.first);
       while (it != string::npos)
       {
         temp[it + 2] = note.second;
-        it = initialState.find(note.first, it + 1);
+        it = currentState.find(note.first, it + 1);
       }
     }
 
-    out << initialState << endl;
-    initialState = move(temp);
+    out << currentState << endl;
+    currentState = move(temp);
   }
 
   long long s = 0;
-  for (int i = offset; i < initialState.size(); i++)
+  for (int i = offset; i < currentState.size(); i++)
   {
-    if (initialState[i] == '#')
+    if (currentState[i] == '#')
       s += (i - offset) + 49999999900;
   }
 
