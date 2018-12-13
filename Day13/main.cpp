@@ -37,13 +37,13 @@ struct Cart
   int x{0};
   int y{0};
 
-  int cartId = 0;
+  char direction{ 0 };
+  int cartId{ 0 };
 
-  char direction = 0;
-  int intersection = -1;
-
+  int intersection{ 2 };
   bool destroyed = false;
   
+  // less comparator for sort operations
   bool operator < (const Cart& second) const
   {
     if (x < second.x)
@@ -56,30 +56,46 @@ struct Cart
 
   void turnLeft()
   {
-    if (direction == 0)
-      direction = 3;
-    else if (direction == 3)
-      direction = 2;
-    else if (direction == 2)
-      direction = 1;
-    else if (direction == 1)
-      direction = 0;
+    switch (direction)
+    {
+    case '^':
+      direction = '<';
+      break;
+    case '<':
+      direction = 'v';
+      break;
+    case 'v':
+      direction = '>';
+      break;
+    case '>':
+      direction = '^';
+      break;
+    default:
+      break;
+    }
   }
 
   void turnRight()
   {
-    if (direction == 0)
-      direction = 1;
-    else if (direction == 1)
-      direction = 2;
-    else if (direction == 2)
-      direction = 3;
-    else if (direction == 3)
-      direction = 0;
+    switch (direction)
+    {
+    case '^':
+      direction = '>';
+      break;
+    case '>':
+      direction = 'v';
+      break;
+    case 'v':
+      direction = '<';
+      break;
+    case '<':
+      direction = '^';
+      break;
+    default:
+      break;
+    }
   }
 };
-
-vector<Cart> carts;
 
 int main()
 {
@@ -91,6 +107,9 @@ int main()
   FStreamReader reader(in);
   auto map = reader.ReadVectorOfWords();
 
+  vector<Cart> carts;
+
+  // read data
   int id = 0;
   for (int i = 0; i < map.size(); i++)
   {
@@ -99,50 +118,16 @@ int main()
     {
       auto & c = line[j];
 
-      if (c == '^')
+      if (c == '^' || c == 'v')
       {
-        Cart cart;
-        cart.x = i;
-        cart.y = j;
-        cart.direction = 0;
-        cart.cartId = ++id;
+        Cart cart{ i, j, c, ++id };
         carts.push_back(cart);
 
         c = '|';
       }
-
-      if (c == '>')
+      else if (c == '>' || c == '<')
       {
-        Cart cart;
-        cart.x = i;
-        cart.y = j;
-        cart.direction = 1;
-        cart.cartId = ++id;
-        carts.push_back(cart);
-
-        c = '-';
-      }
-
-      if (c == 'v')
-      {
-        Cart cart;
-        cart.x = i;
-        cart.y = j;
-        cart.direction = 2;
-        cart.cartId = ++id;
-        carts.push_back(cart);
-
-        c = '|';
-      }
-
-
-      if (c == '<')
-      {
-        Cart cart;
-        cart.x = i;
-        cart.y = j;
-        cart.direction = 3;
-        cart.cartId = ++id;
+        Cart cart{ i, j, c, ++id };
         carts.push_back(cart);
 
         c = '-';
@@ -150,57 +135,53 @@ int main()
     }
   }
 
-  for(int i = 0; carts.size() > 1; ++i)
+  while (1 < count_if(begin(carts), end(carts), [](auto & cart) { return !cart.destroyed; }))
   {
     sort(begin(carts), end(carts));
-    for(auto & cart : carts)
+    for (auto & cart : carts)
     {
-      if(cart.destroyed)
+      if (cart.destroyed)
         continue;
 
       // move forward
-      if (cart.direction == 0)
+      if (cart.direction == '^')
       {
         cart.x -= 1;
       }
-      else if (cart.direction == 1)
+      else if (cart.direction == '>')
       {
         cart.y += 1;
       }
-      else if (cart.direction == 2)
+      else if (cart.direction == 'v')
       {
         cart.x += 1;
       }
-      else if (cart.direction == 3)
+      else if (cart.direction == '<')
       {
         cart.y -= 1;
       }
 
-      if (map[cart.x][cart.y] == ' ')
-      {
-        return 0;
-      }
+      assert(map[cart.x][cart.y] != ' ');
 
-      // resolve curves
+      // turn on curves
       if (map[cart.x][cart.y] == '\\')
       {
-
-        if (cart.direction == 0 || cart.direction == 2)
+        if (cart.direction == '^' || cart.direction == 'v')
           cart.turnLeft();
-        else if (cart.direction == 1 || cart.direction == 3)
+        else if (cart.direction == '>' || cart.direction == '<')
           cart.turnRight();
-
-      } else if (map[cart.x][cart.y] == '/')
+      }
+      else if (map[cart.x][cart.y] == '/')
       {
-
-        if (cart.direction == 0 || cart.direction == 2)
+        if (cart.direction == '^' || cart.direction == 'v')
           cart.turnRight();
-        else if (cart.direction == 1 || cart.direction == 3)
+        else if (cart.direction == '>' || cart.direction == '<')
           cart.turnLeft();
 
       }
+
       // turn on intersections
-      else if(map[cart.x][cart.y] == '+')
+      else if (map[cart.x][cart.y] == '+')
       {
         cart.intersection++;
 
@@ -210,15 +191,13 @@ int main()
           cart.turnRight();
       }
 
-
-
-      // resolve conflicts
+      // resolve collisions
       for (auto & secondCart : carts)
       {
-        if(secondCart.destroyed)
+        if (secondCart.destroyed)
           continue;
 
-        if(cart.cartId == secondCart.cartId)
+        if (cart.cartId == secondCart.cartId)
           continue;
 
         if (cart.x == secondCart.x && cart.y == secondCart.y)
@@ -226,20 +205,16 @@ int main()
           cart.destroyed = true;
           secondCart.destroyed = true;
 
-          cout << "Colision on : " << cart.x << "," << cart.y;
+          cout << "Collision on : " << cart.y << "," << cart.x << endl;
         }
       }
     }
+  }
 
-    int nr = 0;
-    for (auto & cart : carts)
-    {
-      if (!cart.destroyed)
-        nr++;
-    }
-
-    if (nr < 2)
-      break;
+  auto it = find_if(begin(carts), end(carts), [](auto & cart) { return !cart.destroyed; });
+  if (it != end(carts))
+  {
+    cout << "Last car : " << it->y << "," << it->x << endl;
   }
 
   return 0;

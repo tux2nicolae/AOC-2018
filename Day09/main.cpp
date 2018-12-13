@@ -31,23 +31,18 @@ using namespace std;
 using namespace AOC;
 
 //----------------------------------------------------------------------------
+list<int> marbles;
 
-vector<int> marbles;
-
-vector<int>::iterator GetPrevious(vector<int>::iterator it) {
+list<int>::iterator GetPrevious(list<int>::iterator it) {
   if (it == marbles.begin())
     it = marbles.end();
 
-  it--;
-
-  return it;
+  return --it;
 };
 
-vector<int>::iterator GetNext(vector<int>::iterator it) {
-  if (it == marbles.end())
+list<int>::iterator GetNext(list<int>::iterator it) {
+  if (++it == marbles.end())
     return marbles.begin();
-
-  it++;
 
   return it;
 };
@@ -108,8 +103,6 @@ int main()
 
   auto x = *std::max_element(scores.begin(), scores.end());
   cout << x;
-  // auto ret =
-  //   Solve(data);
 
   return 0;
 }
