@@ -32,18 +32,18 @@ using namespace AOC;
 
 //----------------------------------------------------------------------------
 
-list<int> marbles;
+list<int> receipes;
 
 list<int>::iterator GetPrevious(list<int>::iterator it) {
-  if (it == marbles.begin())
-    it = marbles.end();
+  if (it == receipes.begin())
+    it = receipes.end();
 
   return --it;
 };
 
 list<int>::iterator GetNext(list<int>::iterator it) {
-  if (++it == marbles.end())
-    return marbles.begin();
+  if (++it == receipes.end())
+    return receipes.begin();
 
   return it;
 };
@@ -93,11 +93,11 @@ int main()
   // add to list
   int max = 598701;
   
-  marbles.push_back(3);
-  marbles.push_back(7);
+  receipes.push_back(3);
+  receipes.push_back(7);
 
-  auto current = marbles.begin();
-  auto current2 = next(marbles.begin());
+  auto current = receipes.begin();
+  auto current2 = next(receipes.begin());
 
   // vector<int> scores;
 
@@ -109,29 +109,29 @@ int main()
     if (receipe >= 10)
     {
       n++;
-      marbles.push_back(receipe / 10);
+      receipes.push_back(receipe / 10);
       // if (n >= max)
       //   scores.push_back(receipe / 10);
 
-      if(Search(marbles, max))
+      if(Search(receipes, max))
         break;
  
       n++;
-      marbles.push_back(receipe % 10);
+      receipes.push_back(receipe % 10);
       // if (n >= max)
       //   scores.push_back(receipe % 10);
 
-      if (Search(marbles, max))
+      if (Search(receipes, max))
         break;
     }
     else
     {
       n++;
-      marbles.push_back(receipe);
+      receipes.push_back(receipe);
       // if (n >= max)
       //   scores.push_back(receipe);
 
-      if (Search(marbles, max))
+      if (Search(receipes, max))
         break;
     }
 
@@ -151,7 +151,7 @@ int main()
   // for (int i = 0; i < 10; ++i)
   //   cout << scores[i];
 
-  cout << marbles.size() - 6;
+  cout << receipes.size() - 6;
 
   return 0;
 }
