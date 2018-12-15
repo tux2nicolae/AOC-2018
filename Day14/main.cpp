@@ -60,7 +60,7 @@ bool Search(list<int> & list, int n)
   auto it = list.end();
   for (int i = 0; i < 6; ++i)
   {
-    it = prev(it);
+    it = GetPrevious(it);
   }
 
   for (; it != list.end(); it++)

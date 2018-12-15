@@ -46,7 +46,7 @@ auto Solve(T & coordonates)
     map[point.x][point.y] = ++id;
   
   // run lee
-  auto infinitePoints = AOC::Lee(coordonates, map);
+  auto infinitePoints = AOC::Lee(coordonates, map).second;
 
   // get finite points
   vector<Coordonate> finitePoints;
