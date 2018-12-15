@@ -237,6 +237,9 @@ int main()
     return unit.type == Unit::Type::elf && !unit.dead;
   });
 
+  // part 1
+  // int elvespower = 3;
+
   // part 2
   int elvespower = 4;
 
@@ -361,6 +364,14 @@ int main()
     map = backupmap;
     units = backupunits;
 
+    // part 1
+    // if (!(remainingElves && remainingGoblins))
+    // {
+    //   cout << round * remainingPoints << endl;
+    //   break;
+    // }
+
+    // part two
     if (elvesCount == remainingElves)
     {
       cout << round * remainingPoints << endl;
