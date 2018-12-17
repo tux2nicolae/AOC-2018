@@ -42,9 +42,7 @@ int main()
   assert(in2.good());
   assert(out.good());
 
-
   vector<vector<char>> map(2000, vector<char>(2000, '.'));
-  vector<vector<bool>> visited(2000, vector<bool>(2000, false));
 
   int mini = 999999;
   int maxi = 0;
@@ -56,11 +54,8 @@ int main()
     {
       map[i][a] = '#';
 
-      if (i < mini)
-        mini = i;
-      
-      if (i > maxi)
-        maxi = i;
+      mini = std::min(mini, i);
+      maxi = std::max(maxi, i);
     }
   }
 
@@ -70,11 +65,8 @@ int main()
     {
       map[a][j] = '#';
 
-      if (a < mini)
-        mini = a;
-      
-      if (a > maxi)
-        maxi = a;
+      mini = std::min(mini, a);
+      maxi = std::max(maxi, a);
     }
   }
 
