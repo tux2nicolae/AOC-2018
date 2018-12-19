@@ -32,7 +32,7 @@ using namespace AOC;
 
 struct Operation
 {
-  long long OpCode{};
+  string OpCode{};
   long long A{};
   long long B{};
   long long C{};
@@ -209,95 +209,61 @@ int main()
   assert(in.good());
   assert(out.good());
 
-  vector<unique_ptr<baseop>> operationMap;
-  operationMap.push_back(make_unique<addr>());
-  operationMap.push_back(make_unique<addi>());
-  operationMap.push_back(make_unique<mulr>());
-  operationMap.push_back(make_unique<muli>());
-  operationMap.push_back(make_unique<banr>());
-  operationMap.push_back(make_unique<bani>());
-  operationMap.push_back(make_unique<borr>());
-  operationMap.push_back(make_unique<bori>());
-  operationMap.push_back(make_unique<setr>());
-  operationMap.push_back(make_unique<seti>());
-  operationMap.push_back(make_unique<gtir>());
-  operationMap.push_back(make_unique<gtri>());
-  operationMap.push_back(make_unique<gtrr>());
-  operationMap.push_back(make_unique<eqir>());
-  operationMap.push_back(make_unique<eqri>());
-  operationMap.push_back(make_unique<eqrr>());
+  unordered_map<string, unique_ptr<baseop>> operationMap;
+  operationMap["addr"] = make_unique<addr>();
+  operationMap["addi"] = make_unique<addi>();
+  operationMap["mulr"] = make_unique<mulr>();
+  operationMap["muli"] = make_unique<muli>();
+  operationMap["banr"] = make_unique<banr>();
+  operationMap["bani"] = make_unique<bani>();
+  operationMap["borr"] = make_unique<borr>();
+  operationMap["bori"] = make_unique<bori>();
+  operationMap["setr"] = make_unique<setr>();
+  operationMap["seti"] = make_unique<seti>();
+  operationMap["gtir"] = make_unique<gtir>();
+  operationMap["gtri"] = make_unique<gtri>();
+  operationMap["gtrr"] = make_unique<gtrr>();
+  operationMap["eqir"] = make_unique<eqir>();
+  operationMap["eqri"] = make_unique<eqri>();
+  operationMap["eqrr"] = make_unique<eqrr>();
 
   long long ip = 4;
   vector<long long> registers(6, 0);
 
   // part 2
-  registers[0] = 1;
+  // registers[0] = 1;
 
-  string instuction;
-  long long a, b, c;
-
-  unordered_map<string, long long> pos;
-  pos["addr"] = 0;
-  pos["addi"] = 1;
-  pos["mulr"] = 2;
-  pos["muli"] = 3;
-  pos["banr"] = 4;
-  pos["bani"] = 5;
-  pos["borr"] = 6;
-  pos["bori"] = 7;
-  pos["setr"] = 8;
-  pos["seti"] = 9;
-  pos["gtir"] = 10;
-  pos["gtri"] = 11;
-  pos["gtrr"] = 12;
-  pos["eqir"] = 13;
-  pos["eqri"] = 14;
-  pos["eqrr"] = 15;
-
+  Operation input;
   vector<Operation> operations;
-  while (in >> instuction >> a >> b >> c)
-  {
-    Operation input;
 
-    input.OpCode = pos[instuction];
-    input.A = a;
-    input.B = b;
-    input.C = c;
-
+  while (in >> input.OpCode >> input.A >> input.B >> input.C)
     operations.push_back(input);
+
+  // part 1
+  while (true)
+  {
+    auto & operation = operations[registers[ip]];
+    operationMap[operation.OpCode]->Execute(operation, registers);
+
+    registers[ip]++;
+    if (registers[ip] >= operations.size())
+    {
+      registers[ip] = 0;
+      break;
+    }
   }
 
-  // part 1;
-  // while (true)
-  // {
-  //   auto & operation = operations[registers[ip]];
-  //   // cout << registers[ip] << endl;
-  // 
-  //   operationMap[operation.OpCode]->Execute(operation, registers);
-  // 
-  //   registers[ip]++;
-  //   if (registers[ip] >= operations.size())
-  //   {
-  //     registers[ip] = 0;
-  //     break;
-  //   }
-  // }
-
-  int s = 0;
+  cout << registers[0] << endl;
 
   // part 2
+  int s = 0;
   int nr = 10551287;
   for (int i = 1; i <= 10551287; i++)
   {
     if (nr % i == 0)
-      s+=i;
+      s += i;
   }
 
-  // part 1
-  // cout << registers[0] << endl;
-
-  // part 2
   cout << s;
-
   return 0;
 }
