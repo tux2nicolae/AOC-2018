@@ -1,9 +1,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 /**
- * Advent of code 2018
- * @author : Nicolae Telechi
- */
+* Advent of code 2018
+* @author : Nicolae Telechi
+*/
 #include <iostream>
 #include <string>
 #include <memory>
@@ -33,183 +33,166 @@ using namespace AOC;
 
 enum RegionType
 {
-  rocky = 0,  // .
-  wet = 1,    // =
-  narrow = 2, // |
+	rocky = 0,  // .
+	wet = 1,    // =
+	narrow = 2, // |
 };
 
 enum ToolType
 {
-  neither = 0,
-  torch = 1,
-  gear = 2,
+	neither = 0,
+	torch = 1,
+	gear = 2,
 };
 
 struct Distance
 {
-  map<ToolType, int> cost;
+	map<ToolType, int> cost;
 };
 
 constexpr int MOD = 20183;
 constexpr int depth = 3339;
-Coordonate target{ 715, 10 };
+Coordonate target{ 10, 715 };
 
-constexpr int maxX = 1000;
+constexpr int maxX = 100;
 constexpr int maxY = 1000;
-Distance distances[maxX + 1][maxY + 1]{};
 
 int erosionMap[maxX + 1][maxY + 1]{};
+Distance distances[maxX + 1][maxY + 1]{};
+
 int GetErosionLevel(const Coordonate & point)
 {
-  int geologicalIndex = 0;
+	int geologicalIndex = 0;
 
-  if (point.x == 0 && point.y == 0)
-  {
-    geologicalIndex = 0;
-  }
-  else if (point.x == target.x && point.y == target.y)
-  {
-    geologicalIndex = 0;
-  }
-  else if (point.y == 0)
-  {
-    geologicalIndex = (point.x * 48271); // todo
-  }
-  else if (point.x == 0)
-  {
-    geologicalIndex = (point.y * 16807);
-  }
-  else
-  {
-    geologicalIndex = (erosionMap[point.x][point.y - 1] * erosionMap[point.x - 1][point.y]);
-  }
+	if (point.x == 0 && point.y == 0)
+	{
+		geologicalIndex = 0;
+	}
+	else if (point.x == target.x && point.y == target.y)
+	{
+		geologicalIndex = 0;
+	}
+	else if (point.y == 0)
+	{
+		geologicalIndex = (point.x * 16807); // todo
+	}
+	else if (point.x == 0)
+	{
+		geologicalIndex = (point.y * 48271);
+	}
+	else
+	{
+		geologicalIndex = (erosionMap[point.x][point.y - 1] * erosionMap[point.x - 1][point.y]) % MOD;
+	}
 
 
-  return (geologicalIndex + depth) % MOD;
+	return (geologicalIndex + depth) % MOD;
 }
 
 RegionType GetRegionType(const Coordonate & point)
 {
-  return RegionType(erosionMap[point.x][point.y] % 3);
+	return RegionType(erosionMap[point.x][point.y] % 3);
 }
 
-vector<ToolType> GetTools(RegionType nextRegion)
+vector<ToolType> GetTools(RegionType region)
 {
-  vector<ToolType> tools;
-  if (nextRegion == rocky)
-  {
-    return { gear, torch };
-  }
-  else if (nextRegion == wet)
-  {
-    return { gear, neither };
-  }
-  else if (nextRegion == narrow)
-  {
-    return { torch, neither };
-  }
+	switch (region)
+	{
+	case rocky:
+		return { gear, torch };
+	case wet:
+		return { gear, neither };
+	case narrow:
+		return { torch, neither };
+	default:
+		assert(false);
+		break;
+	}
 
-  assert(false);
-  return { torch, neither };
+	return {};
 }
 
 //----------------------------------------------------------------------------
 
 int main()
 {
-  ifstream in("D:\\AOC-2018\\Day21\\Day21.in");
-  ofstream out("D:\\AOC-2018\\Day21\\Day21.out");
-  assert(in.good());
-  assert(out.good());
+	int riskLevel = 0;
+	for (int i = 0; i <= maxX; i++)
+	{
+		for (int j = 0; j <= maxY; j++)
+		{
+			auto erosionLevel = GetErosionLevel(Coordonate{ i, j });
+			erosionMap[i][j] = erosionLevel;
 
-  int s = 0;
-  for (int i = 0; i <= maxX; i++)
-  {
-    for (int j = 0; j <= maxY; j++)
-    {
-      auto erosionLevel = GetErosionLevel(Coordonate{ i, j });
-      erosionMap[i][j] = erosionLevel;
+			if(i <= target.x && j <= target.y)
+				riskLevel += GetRegionType(Coordonate{ i, j });
+		}
+	}
 
-      s += GetRegionType(Coordonate{ i, j });
-    }
-  }
+	// part 1
+	cout << riskLevel << endl;
 
-  cout << s << endl;
+	queue<Coordonate> unvisited;
+	unvisited.push(Coordonate{ 0, 0 });
+	distances[0][0].cost[torch] = 1;
+	distances[0][0].cost[gear] = 8;
 
-  // rocky -> climbing, torch
-  // wet -> gear, neither
-  // narrow -> torch, neither
+	auto isInBoundary = [&](const Coordonate & to)-> bool
+	{
+		return !(to.x < 0 || to.y < 0 || to.x > maxX || to.y > maxY);
+	};
 
-  queue<Coordonate> unvisited;
-  unvisited.push(Coordonate{ 0, 0 });
-  distances[0][0].cost[torch] = 1;
+	// run
+	while (!unvisited.empty())
+	{
+		auto from = unvisited.front();
+		unvisited.pop();
 
-  auto isInBoundary = [&](const Coordonate & to)-> bool
-  {
-    return !(to.x < 0 || to.y < 0 || to.x > maxX || to.y > maxY);
-  };
+		static const int directionX[4] = { -1,  0, 1, 0 };
+		static const int directionY[4] = { 0,  1, 0, -1 };
 
-  // run
-  while (!unvisited.empty())
-  {
-    auto from = unvisited.front();
-    unvisited.pop();
+		for (int i = 0; i < 4; ++i)
+		{
+			Coordonate to;
+			to.x = from.x + directionX[i];
+			to.y = from.y + directionY[i];
 
-    static const int directionX[4] = { -1,  0, 1, 0 };
-    static const int directionY[4] = { 0,  1, 0, -1 };
+			if (!isInBoundary(to))
+				continue;
 
-    for (int i = 0; i < 4; ++i)
-    {
-      Coordonate to;
-      to.x = from.x + directionX[i];
-      to.y = from.y + directionY[i];
+			auto nextTools = GetTools(GetRegionType(to));
 
-      if (!isInBoundary(to))
-        continue;
+			assert(nextTools.size() == 2);
+			assert((from.x == 0 && from.y == 0) || distances[from.x][from.y].cost.size() == 2);
 
-      auto tools = GetTools(GetRegionType(to));
+			for (auto &[currentTool, currentCost] : distances[from.x][from.y].cost)
+			{
+				if (find(begin(nextTools), end(nextTools), currentTool) == end(nextTools))
+					continue;
+				
+				for (auto & nextTool : nextTools)
+				{
+					int cost = currentCost + 1;
+					if (currentTool != nextTool)
+						cost += 7;
 
-      assert(tools.size() == 2);
-      assert((from.x == 0 && from.y == 0) || distances[from.x][from.y].cost.size() == 2);
+					// set to infinite cost
+					auto & nextCost = distances[to.x][to.y].cost[nextTool];
+					if (nextCost == 0)
+						nextCost = numeric_limits<int>::max();
 
-      for (auto &[currentTool, currentCost] : distances[from.x][from.y].cost)
-      {
-        for (auto & nextTool : tools)
-        {
-          int cost = currentCost + 1;
-          if (currentTool != nextTool)
-            cost += 7;
+					if (cost < nextCost)
+					{
+						nextCost = cost;
+						unvisited.push(to);
+					}
+				}
+			}
+		}
+	}
 
-          // set to infinite cost
-          auto & nextCost = distances[to.x][to.y].cost[nextTool];
-          if (nextCost == 0)
-            nextCost = numeric_limits<int>::max();
+	auto targetCost = distances[target.x][target.y].cost;
+	cout << targetCost[torch] - 1;
 
-          if (cost < nextCost)
-          {
-            nextCost = cost;
-            unvisited.push(to);
-          }
-        }
-      }
-    }
-  }
-
-  for (int i = 0; i <= maxX; i++)
-  {
-    for (int j = 0; j <= maxY; j++)
-    {
-      auto targetCost = distances[i][j].cost;
-
-      auto it = std::min_element(begin(targetCost), end(targetCost));
-      out << erosionMap[i][j] << " ";
-    }
-
-    out << endl;
-  }
-
-  auto targetCost = distances[target.y][target.x].cost;
-  cout << targetCost[torch] - 1;
-
-  return 0;
+	return 0;
 }
