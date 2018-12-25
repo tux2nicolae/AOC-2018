@@ -1,7 +1,7 @@
-﻿/**
- * Advent of code 2018
- * @author : Nicolae Telechi
- */
+/**
+* Advent of code 2018
+* @author : Nicolae Telechi
+*/
 #include <iostream>
 #include <string>
 #include <memory>
@@ -76,27 +76,37 @@ int main()
     nanobot.y = stoi(match[2]);
     nanobot.z = stoi(match[3]);
     nanobot.range = stoi(match[4]);
-    
+
     nanobots.push_back(nanobot);
   }
+
 
   auto maxNanobot = *max_element(begin(nanobots), end(nanobots), [](const auto & first, const auto & second) {
     return first.range < second.range;
   });
 
+  // part 1
+  int part1 = 0;
+  for (auto & nanobot : nanobots)
+  {
+    auto d = Distance(maxNanobot, nanobot);
+    if (d <= maxNanobot.range)
+      part1++;
+  }
+
   // calculate intersections
   for (auto & currentNanobot : nanobots)
   {
-	  int intersections = 0;
-	  for (auto & intersectNanobot : nanobots)
-	  {
-		  auto d = Distance(currentNanobot, intersectNanobot) - intersectNanobot.range;
-		  if (d <= currentNanobot.range)
-		  {
+    int intersections = 0;
+    for (auto & intersectNanobot : nanobots)
+    {
+      auto d = Distance(currentNanobot, intersectNanobot) - intersectNanobot.range;
+      if (d <= currentNanobot.range)
+      {
         intersections++;
         intersects[currentNanobot.id][intersectNanobot.id] = true;
-		  }
-	  }
+      }
+    }
 
     currentNanobot.intersections = intersections;
   }
@@ -111,7 +121,7 @@ int main()
     {
       out << (intersects[first.id][second.id] ? '#' : '.');
     }
-  
+
     out << endl;
   }
 
@@ -123,7 +133,7 @@ int main()
   {
     for (auto & second : nanobots)
     {
-      if(Distance(first, second) == first.range + second.range)
+      if (Distance(first, second) == first.range + second.range)
       {
         cout << "Evrica : " << first.id << ' ' << second.id << endl;
       }
@@ -155,23 +165,23 @@ int main()
   {
     if (!firstmatch->range)
       break;
-  
+
     // move x
     firstmatch->x--;
     firstmatch->range--;
     assert(checkPerfectIntersect());
-  
+
     if (!firstmatch->range)
       break;
-  
+
     // move y
     firstmatch->y--;
     firstmatch->range--;
     assert(checkPerfectIntersect());
-  
+
     if (!firstmatch->range)
       break;
-  
+
     // move z
     firstmatch->z--;
     firstmatch->range--;
@@ -194,7 +204,7 @@ int main()
   origin.z = 0;
 
   auto distanceToMe = Distance(origin, me);
-  cout << distanceToMe;
+  cout << part1 << " " << distanceToMe;
 
   return 0;
 }
