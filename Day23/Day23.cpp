@@ -1,7 +1,7 @@
 /**
-* Advent of code 2018
-* @author : Nicolae Telechi
-*/
+ * Advent of code 2018
+ * @author : Nicolae Telechi
+ */
 #include <iostream>
 #include <string>
 #include <memory>
@@ -19,14 +19,6 @@
 #include <regex>
 
 using namespace std;
-
-int Abs(const int x)
-{
-  if (x > 0)
-    return x;
-
-  return -x;
-};
 
 //----------------------------------------------------------------------------
 
@@ -53,8 +45,8 @@ int Distance(const Nanobot & first, const Nanobot & second)
 
 int main()
 {
-  ifstream in("C:\\Users\\Telechi\\Desktop\\Day23.in");
-  ofstream out("C:\\Users\\Telechi\\Desktop\\Day23.out");
+  ifstream in("D:\\AOC-2018\\Day23\\Day23.in");
+  ofstream out("D:\\AOC-2018\\Day23\\Day23.out");
   assert(in.good());
   assert(out.good());
 
@@ -125,8 +117,8 @@ int main()
     out << endl;
   }
 
-  // remove noise only based on my input (I have 976 points with all intersect each other)
-  nanobots.erase(nanobots.begin(), nanobots.begin() + 31);
+  // remove noise only based on my input (I have 979 points with all intersect each other)
+  nanobots.erase(nanobots.begin(), nanobots.begin() + 21);
 
   auto m = numeric_limits<int>::max();
   for (auto & first : nanobots)
@@ -141,7 +133,6 @@ int main()
   }
 
   // any two points from evrica will fit our condition
-
   auto firstmatch = find_if(begin(nanobots), end(nanobots), [](const auto & nanobot) {
     return nanobot.id == 602;
   });
@@ -150,15 +141,14 @@ int main()
     return nanobot.id == 3;
   });
 
-  assert(firstmatch != nanobots.end());
-  assert(secondmatch != nanobots.end());
-
-  auto checkPerfectIntersect = [&]()
+  auto checkMarginIntersection = [&]()
   {
     return Distance(*firstmatch, *secondmatch) == firstmatch->range + secondmatch->range;
   };
 
-  assert(checkPerfectIntersect());
+  assert(firstmatch != nanobots.end());
+  assert(secondmatch != nanobots.end());
+  assert(checkMarginIntersection());
 
   // move to intersection point
   while (true)
@@ -169,7 +159,7 @@ int main()
     // move x
     firstmatch->x--;
     firstmatch->range--;
-    assert(checkPerfectIntersect());
+    assert(checkMarginIntersection());
 
     if (!firstmatch->range)
       break;
@@ -177,7 +167,7 @@ int main()
     // move y
     firstmatch->y--;
     firstmatch->range--;
-    assert(checkPerfectIntersect());
+    assert(checkMarginIntersection());
 
     if (!firstmatch->range)
       break;
@@ -185,23 +175,19 @@ int main()
     // move z
     firstmatch->z--;
     firstmatch->range--;
-    assert(checkPerfectIntersect());
+    assert(checkMarginIntersection());
   }
 
-  assert(checkPerfectIntersect());
+  assert(checkMarginIntersection());
 
   // find any matching point
+  Nanobot origin;
   Nanobot me = *firstmatch;
 
   assert(Distance(*firstmatch, me) == firstmatch->range);
   assert(Distance(*secondmatch, me) == secondmatch->range);
   assert(Distance(*firstmatch, *secondmatch) == firstmatch->range + secondmatch->range);
   assert(Distance(*firstmatch, me) + Distance(me, *secondmatch) == Distance(*firstmatch, *secondmatch));
-
-  Nanobot origin;
-  origin.x = 0;
-  origin.y = 0;
-  origin.z = 0;
 
   auto distanceToMe = Distance(origin, me);
   cout << part1 << " " << distanceToMe;
